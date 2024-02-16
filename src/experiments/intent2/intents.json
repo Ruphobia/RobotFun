@@ -1,0 +1,23 @@
+{
+    "intents": [
+      {
+        "tag": "command",
+        "patterns": [
+          "Open the door",
+          "Turn on the lights",
+          "Play some music",
+          "Set an alarm for 7 AM"
+        ]
+      },
+      {
+        "tag": "question",
+        "patterns": [
+          "What time is it?",
+          "How's the weather today?",
+          "Is there any meeting scheduled for today?",
+          "Can you tell me the latest news?"
+        ]
+      }
+    ]
+  }
+  
