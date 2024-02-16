@@ -1,72 +1,55 @@
 #!/usr/bin/python3.8
 import json
-import torch
-from sklearn.model_selection import train_test_split
-from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification, Trainer, TrainingArguments
 import os
+import torch
+from torch.utils.data import DataLoader
+from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification, Trainer, TrainingArguments
+from sklearn.model_selection import train_test_split
+from datasets import Dataset
 
 def get_current_directory_path():
-    """
-    Returns the absolute path of the current working directory.
-
-    Returns:
-        str: The absolute path of the current working directory.
-    """
-    current_path = os.getcwd()
-    return current_path
+    return os.getcwd()
 
 def load_data(file_path='intents.json'):
     with open(file_path, 'r') as f:
         intents = json.load(f)
-    texts = []
-    labels = []
-    tag_to_idx = {}
+    texts, labels, tag_to_idx = [], [], {}
     for intent in intents['intents']:
         tag = intent['tag']
-        if tag not in tag_to_idx:
-            tag_to_idx[tag] = len(tag_to_idx)
+        tag_to_idx[tag] = tag_to_idx.get(tag, len(tag_to_idx))
         for pattern in intent['patterns']:
             texts.append(pattern)
             labels.append(tag_to_idx[tag])
     return texts, labels, tag_to_idx
 
-class IntentDataset(torch.utils.data.Dataset):
-    def __init__(self, encodings, labels):
-        self.encodings = encodings
-        self.labels = labels
+def prepare_dataset(texts, labels):
+    tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
+    encodings = tokenizer(texts, truncation=True, padding=True, max_length=64)
+    dataset = Dataset.from_dict({"input_ids": encodings['input_ids'], "attention_mask": encodings['attention_mask'], "labels": labels})
+    return dataset, tokenizer
 
-    def __getitem__(self, idx):
-        item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
-        item['labels'] = torch.tensor(self.labels[idx])
-        return item
-
-    def __len__(self):
-        return len(self.labels)
-
-def main():
-    # Setup device
+def do_training():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
     texts, labels, tag_to_idx = load_data(f"{get_current_directory_path()}/intents.json")
-    tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
-
-    train_texts, val_texts, train_labels, val_labels = train_test_split(texts, labels, test_size=0.1)
-    train_encodings = tokenizer(train_texts, truncation=True, padding=True, max_length=64)
-    val_encodings = tokenizer(val_texts, truncation=True, padding=True, max_length=64)
-
-    train_dataset = IntentDataset(train_encodings, train_labels)
-    val_dataset = IntentDataset(val_encodings, val_labels)
+    dataset, tokenizer = prepare_dataset(texts, labels)
+    dataset = dataset.train_test_split(test_size=0.1)
+    train_dataset = dataset['train']
+    eval_dataset = dataset['test']
 
     training_args = TrainingArguments(
-        output_dir="{get_current_directory_path()}/results",
-        num_train_epochs=3,
+        output_dir=f"{get_current_directory_path()}/results",
+        evaluation_strategy="epoch",
+        save_strategy="epoch",
+        learning_rate=5e-5,
         per_device_train_batch_size=8,
-        per_device_eval_batch_size=64,
-        warmup_steps=500,
+        per_device_eval_batch_size=8,
+        num_train_epochs=3,
         weight_decay=0.01,
-        logging_dir="{get_current_directory_path()}/logs",
-        logging_steps=10,
+        load_best_model_at_end=True,
+        metric_for_best_model="loss",
+        logging_dir=f"{get_current_directory_path()}/logs",
     )
 
     model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased', num_labels=len(tag_to_idx)).to(device)
@@ -75,15 +58,21 @@ def main():
         model=model,
         args=training_args,
         train_dataset=train_dataset,
-        eval_dataset=val_dataset
+        eval_dataset=eval_dataset,
+        tokenizer=tokenizer,
     )
 
     trainer.train()
 
-    # Save the model and tokenizer
-    model.save_pretrained(f"{get_current_directory_path()}/intent_classification_model")
-    tokenizer.save_pretrained(f"{get_current_directory_path()}/intent_classification_model")
-    print("Training complete. Model saved to ./intent_classification_model")
+    model_dir = f"{get_current_directory_path()}/intent_classification_model"
+    model.save_pretrained(model_dir)
+    tokenizer.save_pretrained(model_dir)
+
+    mapping_file = os.path.join(model_dir, "tag_to_idx.json")
+    with open(mapping_file, 'w') as f:
+        json.dump(tag_to_idx, f)
+
+    print("Training complete. Model and mapping saved to", model_dir)
 
 if __name__ == "__main__":
-    main()
+    do_training()
