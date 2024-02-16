@@ -1,0 +1,50 @@
+    Question: Seeking specific information, clarification, or further details.
+    Command: Directing the AI to perform a task, action, or set of instructions.
+    Statement: Sharing information, facts, opinions, or personal observations.
+    Request: Asking for help, services, information, or resources.
+    Greeting: Initiating a conversation with salutations or acknowledging someone's presence.
+    Farewell: Ending a conversation or parting ways.
+    Agreement: Showing concurrence, acceptance, or affirmation of a point or idea.
+    Disagreement: Expressing a contrasting opinion, denial, or refusal.
+    Clarification: Requesting or providing additional information for better understanding.
+    Confirmation: Seeking or giving verification, affirmation, or acknowledgment.
+    Apology: Expressing regret, remorse, or sorrow for actions or misunderstandings.
+    Thanking: Showing gratitude or appreciation.
+    Complaint: Expressing dissatisfaction, grievances, or issues needing resolution.
+    Suggestion: Proposing ideas, advice, or recommendations.
+    Excuse: Providing justifications, reasons, or explanations for actions or behaviors.
+    Invitation: Requesting the presence or participation of someone in an event or activity.
+    Warning: Alerting to potential danger, risks, or undesirable outcomes.
+    Praise: Expressing approval, admiration, or compliments.
+    Criticism: Providing feedback that points out faults or areas for improvement.
+    Joke: Sharing something intended to amuse or provoke laughter.
+    Empathy: Expressing understanding, sympathy, or shared feelings.
+    Consolation: Offering comfort, solace, or sympathy in times of distress or sadness.
+    Encouragement: Motivating, inspiring, or boosting someone's confidence.
+    Instruction: Providing detailed guidelines, steps, or methods to accomplish a task.
+    Negotiation: Engaging in discussion aimed at reaching an agreement.
+    Persuasion: Attempting to convince or influence someone's opinion or decision.
+    Inquiry: Conducting a more formal or systematic exploration of a topic.
+    Offer: Proposing something available for acceptance or rejection.
+    Refusal: Declining an offer, request, or suggestion.
+    Surprise: Expressing astonishment, shock, or unexpected reactions.
+    Sympathy: Sharing feelings of pity or sorrow for someone else's misfortune.
+    Celebration: Acknowledging a happy occasion, achievement, or milestone.
+    Consent: Giving permission or agreeing to a proposal or request.
+    Rejection: Dismissing or turning down a proposal, idea, or interaction.
+    Indifference: Showing lack of interest, concern, or preference.
+    Curiosity: Expressing a desire to learn more about something interesting or unknown.
+    Confession: Admitting something personal, typically a mistake or a secret.
+    Reminiscence: Sharing memories or nostalgic moments from the past.
+    Explanation: Providing a detailed account or rationale behind an action or fact.
+    Prediction: Making a forecast or speculation about future events based on current information or trends.
+    Challenge: Presenting a task or problem that requires a solution or response.
+    Quotation: Citing the words of another person or source.
+    Sarcasm: Using irony to mock or convey contempt.
+    Teasing: Playfully poking fun at someone in a friendly manner.
+    Flattery: Complimenting or praising someone, often excessively, to win favor.
+    Concession: Acknowledging a point in an argument, often reluctantly.
+    Recapitulation: Summarizing or restating the main points of a discussion.
+    Speculation: Theorizing without firm evidence, pondering possibilities.
+    Assurance: Offering confidence or security in a decision or outcome.
+    Instruction: Directing or educating with specific information on how to do something.
