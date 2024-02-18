@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index Page</title>
+    <style>
+        /* CSS styles */
+        header {
+            background-color: #e0e0e0; /* Slightly darker off-white background */
+            padding: 10px 0; /* Adjust padding to allow for logo height */
+            display: flex; /* Use flexbox for layout */
+            align-items: center; /* Center items vertically */
+            justify-content: start; /* Align items to the start of the header */
+            margin-bottom: 20px; /* Space below the header */
+            height: 100px; /* Explicit height for the header */
+        }
+
+        .header-logo {
+            height: 90%; /* Scale logo to 90% of the header's height */
+            margin-left: 10px; /* Space from the left edge of the header */
+            margin-right: 20px; /* Space between the logo and the next element */
+        }
+
+        nav ul {
+            list-style-type: none; /* Remove bullet points from list */
+            padding: 0; /* Remove padding */
+            margin: 0; /* Remove margin */
+            display: flex; /* Display list items in a row */
+            align-items: center; /* Center items vertically */
+        }
+
+        nav ul li {
+            margin-right: 10px; /* Space between navigation items */
+        }
+
+        .button {
+            padding: 10px 20px; /* Padding around text */
+            background-color: #4CAF50; /* Button color */
+            color: white; /* Text color */
+            text-decoration: none; /* Remove underline from links */
+            border: 2px solid #4CAF50; /* Border color */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Cursor appearance */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Transition for hover effect */
+            font-weight: bold; /* Bold text */
+        }
+
+        .button:hover {
+            background-color: #45a049; /* Button hover color */
+            color: white;
+        }
+
+        .button:active {
+            background-color: #3e8e41; /* Button active color */
+            border-color: #3e8e41;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="roger.webp" alt="Roger's Logo" class="header-logo">
+        <nav>
+            <ul>
+                <li><a href="index.html" class="button">Home</a></li>
+                <li><a href="gpt.html" class="button">RGPT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <!-- Rest of your HTML content goes here -->
+</body>
+</html>

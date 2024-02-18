@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Monitor</title>
+    <style>
+        /* Inline CSS for visualization */
+        .bar-graph-container, .data-display-container {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        .bar-graph {
+            display: flex;
+            align-items: flex-end;
+            height: 200px;
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+        .bar-graph div, .data-bar {
+            margin: 0 5px;
+            background-color: #007bff;
+            width: 20px; /* Adjust the width of the bars */
+            text-align: center;
+            color: white;
+            font-size: 14px;
+        }
+        .bar-graph-title, .data-title {
+            margin-bottom: 10px;
+        }
+        .max-value, .data-value {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Include header -->
+    <div id="header-container"></div>
+
+    <div id="sysmon-data">
+        <!-- System monitoring data will be displayed here -->
+    </div>
+
+    <!-- Include footer -->
+    <div id="footer-container"></div>
+
+    <script>
+        // Function to fetch system monitoring data from the API endpoint
+        function fetchSysMonData() {
+            fetch('/api/sysmon')
+            .then(response => response.json())
+            .then(data => {
+                // Clear previous data
+                document.getElementById('sysmon-data').innerHTML = '';
+
+                // Display CPU temperature bar graph
+                displayBarGraph(data.cpu_temps, data.cpu_max_temp, 'CPU Temperature (°F)', 'cpu-temp', true);
+
+                // Display GPU temperature bar graph
+                displayBarGraph(data.gpu_temps, data.gpu_max_temp, 'GPU Temperature (°F)', 'gpu-temp', true);
+
+                // Graph each CPU's load percentage
+                displayMultiBarGraph(data.cpu_usages, 'CPU Load (%)', 'cpu-load', data.total_cpu_usage);
+
+                // Graph each GPU's load percentage
+                displayMultiBarGraph(data.gpu_loads, 'GPU Load (%)', 'gpu-load', data.max_gpu_load);
+
+                // Display System RAM usage as a number in GB
+                displayDataValue(data.sys_ram_gb, 'System RAM Usage (GB)', 'sys-ram-usage');
+
+                // Display GPU RAM usage as a number in GB
+                displayDataValue(data.total_gpu_ram_gb, 'Total GPU RAM Usage (GB)', 'gpu-ram-usage');
+            })
+            .catch(error => console.error('Error fetching system monitoring data:', error));
+        }
+
+        // Function to display bar graph for temperature data
+        function displayBarGraph(data, maxValue, title, containerId, isTemp) {
+            const container = document.createElement('div');
+            container.className = 'bar-graph-container';
+            document.getElementById('sysmon-data').appendChild(container);
+
+            const graphTitle = document.createElement('div');
+            graphTitle.textContent = title;
+            graphTitle.className = 'bar-graph-title';
+            container.appendChild(graphTitle);
+
+            const graphBars = document.createElement('div');
+            graphBars.className = 'bar-graph';
+            container.appendChild(graphBars);
+
+            data.forEach(value => {
+                const bar = document.createElement('div');
+                bar.style.height = `${value}%`; // Height in percentage for visualization
+                bar.textContent = `${Math.trunc(value)}`; // Truncate to whole number
+                graphBars.appendChild(bar);
+            });
+
+            const maxValueElement = document.createElement('div');
+            maxValueElement.textContent = `Max: ${Math.trunc(maxValue)}${isTemp ? '°F' : '%'}`;
+            maxValueElement.className = 'max-value';
+            container.appendChild(maxValueElement);
+        }
+
+        // Function to display a multi bar graph for load data
+        function displayMultiBarGraph(data, title, containerId, totalLoad) {
+            const container = document.createElement('div');
+            container.className = 'bar-graph-container';
+            document.getElementById('sysmon-data').appendChild(container);
+
+            const graphTitle = document.createElement('div');
+            graphTitle.textContent = `${title} - Total: ${totalLoad.toFixed(1)}%`;
+            graphTitle.className = 'bar-graph-title';
+            container.appendChild(graphTitle);
+
+            const graphBars = document.createElement('div');
+            graphBars.className = 'bar-graph';
+            container.appendChild(graphBars);
+
+            data.forEach(value => {
+                const bar = document.createElement('div');
+                bar.style.height = `${value}%`;
+                bar.textContent = `${Math.trunc(value)}`;
+                graphBars.appendChild(bar);
+            });
+        }
+
+        // Function to display data values for RAM usage
+        function displayDataValue(value, title, containerId) {
+            const container = document.createElement('div');
+            container.className = 'data-display-container';
+            document.getElementById('sysmon-data').appendChild(container);
+
+            const dataTitle = document.createElement('div');
+            dataTitle.textContent = title;
+            dataTitle.className = 'data-title';
+            container.appendChild(dataTitle);
+
+            const dataValue = document.createElement('div');
+            dataValue.textContent = `${value.toFixed(2)} GB`;
+            dataValue.className = 'data-value';
+            container.appendChild(dataValue);
+        }
+
+        // Load header and footer using JavaScript (optional)
+        document.addEventListener("DOMContentLoaded", function() {
+            ['header', 'footer'].forEach(function(element) {
+                var container = document.getElementById(`${element}-container`);
+                var request = new XMLHttpRequest();
+                request.open("GET", `${element}.html`, true);
+                request.onreadystatechange = function() {
+                    if (request.readyState === 4 && request.status === 200) {
+                        container.innerHTML = request.responseText;
+                    }
+                };
+                request.send();
+            });
+        });
+
+        // Fetch system monitoring data on document load and refresh every second
+        document.addEventListener("DOMContentLoaded", fetchSysMonData);
+        setInterval(fetchSysMonData, 1000);
+    </script>
+</body>
+</html>
