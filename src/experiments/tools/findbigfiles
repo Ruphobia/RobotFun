@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Function to recursively traverse directories and their subdirectories
+traverse_directories() {
+    local dir_to_traverse="$1"
+    local min_size="5G"
+
+    # Find directories and their sizes within the specified directory
+    find "$dir_to_traverse" -mindepth 1 -maxdepth 1 -type d | while read -r sub_dir; do
+        # Get the size of the directory
+        size=$(du -sh "$sub_dir" | awk '{print $1}')
+        echo "Directory: $sub_dir - Size: $size"
+        # Extract numeric size without unit (e.g., 5G -> 5)
+        size_num=$(echo "$size" | awk '{print $1}')
+        # Check if size is equal to or larger than 5GB
+        if [[ $size_num =~ ^[0-9.]+[Gg]$ ]]; then
+            if (( $(echo "$size_num >= ${min_size%G}" | bc -l) )); then
+                # Traverse deeper into the directory
+                traverse_directories "$sub_dir"
+            fi
+        fi
+    done
+}
+
+# Check if an input parameter is provided for the starting directory
+if [[ -n $1 ]]; then
+    # Use the input parameter as the starting directory
+    search_dir="$1"
+else
+    # Default to starting from the root directory
+    search_dir="/"
+fi
+
+# Set the target drive
+target_drive="/dev/sda2"
+
+# Find directories and their sizes on the target drive
+echo "Finding directories and their sizes on $target_drive..."
+traverse_directories "$search_dir"

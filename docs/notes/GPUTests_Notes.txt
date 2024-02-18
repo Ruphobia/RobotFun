@@ -1,0 +1,136 @@
+
+start ollama server: ollama serve &
+start ollama chat session: ollama run --verbose dolphin-mistral
+Monitor nvidia state: while true; do nvidia-smi; sleep 1; done
+
+
+Test prompt:
+
+write me a python3 web server using tornado
+
+Benchmarks:
+
+Setup:
+P100 (card 1) -> 8x slot
+total duration:       1m12.413237645s
+load duration:        1.295874ms
+prompt eval count:    37 token(s)
+prompt eval duration: 1.120528s
+prompt eval rate:     33.02 tokens/s
+eval count:           429 token(s)
+eval duration:        1m11.277494s
+eval rate:            6.02 tokens/s
+
+P100 (card 1) -> 16x slot
+total duration:       3m7.429998745s
+load duration:        1.041038ms
+prompt eval count:    37 token(s)
+prompt eval duration: 849.631ms
+prompt eval rate:     43.55 tokens/s
+eval count:           607 token(s)
+eval duration:        3m6.575623s
+eval rate:            3.25 tokens/s
+
+P100 (card 2) -> 8x slot
+total duration:       1m18.864986143s
+load duration:        1.228419ms
+prompt eval count:    37 token(s)
+prompt eval duration: 1.594827s
+prompt eval rate:     23.20 tokens/s
+eval count:           209 token(s)
+eval duration:        1m17.266584s
+eval rate:            2.70 tokens/s
+
+/usr/local/cuda-12.3/extras/demo_suite/deviceQuery -diag
+
+ CUDA Device Query (Runtime API) version (CUDART static linking)
+
+Detected 1 CUDA Capable device(s)
+
+Device 0: "Tesla P100-PCIE-16GB"
+  CUDA Driver Version / Runtime Version          12.4 / 12.3
+  CUDA Capability Major/Minor version number:    6.0
+  Total amount of global memory:                 16269 MBytes (17059545088 bytes)
+  (56) Multiprocessors, ( 64) CUDA Cores/MP:     3584 CUDA Cores
+  GPU Max Clock rate:                            1329 MHz (1.33 GHz)
+  Memory Clock rate:                             715 Mhz
+  Memory Bus Width:                              4096-bit
+  L2 Cache Size:                                 4194304 bytes
+  Maximum Texture Dimension Size (x,y,z)         1D=(131072), 2D=(131072, 65536), 3D=(16384, 16384, 16384)
+  Maximum Layered 1D Texture Size, (num) layers  1D=(32768), 2048 layers
+  Maximum Layered 2D Texture Size, (num) layers  2D=(32768, 32768), 2048 layers
+  Total amount of constant memory:               65536 bytes
+  Total amount of shared memory per block:       49152 bytes
+  Total number of registers available per block: 65536
+  Warp size:                                     32
+  Maximum number of threads per multiprocessor:  2048
+  Maximum number of threads per block:           1024
+  Max dimension size of a thread block (x,y,z): (1024, 1024, 64)
+  Max dimension size of a grid size    (x,y,z): (2147483647, 65535, 65535)
+  Maximum memory pitch:                          2147483647 bytes
+  Texture alignment:                             512 bytes
+  Concurrent copy and kernel execution:          Yes with 2 copy engine(s)
+  Run time limit on kernels:                     No
+  Integrated GPU sharing Host Memory:            No
+  Support host page-locked memory mapping:       Yes
+  Alignment requirement for Surfaces:            Yes
+  Device has ECC support:                        Enabled
+  Device supports Unified Addressing (UVA):      Yes
+  Device supports Compute Preemption:            Yes
+  Supports Cooperative Kernel Launch:            Yes
+  Supports MultiDevice Co-op Kernel Launch:      Yes
+  Device PCI Domain ID / Bus ID / location ID:   0 / 67 / 0
+  Compute Mode:
+     < Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) >
+
+deviceQuery, CUDA Driver = CUDART, CUDA Driver Version = 12.4, CUDA Runtime Version = 12.3, NumDevs = 1, Device0 = Tesla P100-PCIE-16GB
+Result = PASS
+
+P100 (card 2) -> 16x slot
+
+
+
+
+Detected 1 CUDA Capable device(s)
+
+Device 0: "Tesla P100-PCIE-16GB"
+  CUDA Driver Version / Runtime Version          12.4 / 12.3
+  CUDA Capability Major/Minor version number:    6.0
+  Total amount of global memory:                 16269 MBytes (17059545088 bytes)
+  (56) Multiprocessors, ( 64) CUDA Cores/MP:     3584 CUDA Cores
+  GPU Max Clock rate:                            1329 MHz (1.33 GHz)
+  Memory Clock rate:                             715 Mhz
+  Memory Bus Width:                              4096-bit
+  L2 Cache Size:                                 4194304 bytes
+  Maximum Texture Dimension Size (x,y,z)         1D=(131072), 2D=(131072, 65536), 3D=(16384, 16384, 16384)
+  Maximum Layered 1D Texture Size, (num) layers  1D=(32768), 2048 layers
+  Maximum Layered 2D Texture Size, (num) layers  2D=(32768, 32768), 2048 layers
+  Total amount of constant memory:               65536 bytes
+  Total amount of shared memory per block:       49152 bytes
+  Total number of registers available per block: 65536
+  Warp size:                                     32
+  Maximum number of threads per multiprocessor:  2048
+  Maximum number of threads per block:           1024
+  Max dimension size of a thread block (x,y,z): (1024, 1024, 64)
+  Max dimension size of a grid size    (x,y,z): (2147483647, 65535, 65535)
+  Maximum memory pitch:                          2147483647 bytes
+  Texture alignment:                             512 bytes
+  Concurrent copy and kernel execution:          Yes with 2 copy engine(s)
+  Run time limit on kernels:                     No
+  Integrated GPU sharing Host Memory:            No
+  Support host page-locked memory mapping:       Yes
+  Alignment requirement for Surfaces:            Yes
+  Device has ECC support:                        Enabled
+  Device supports Unified Addressing (UVA):      Yes
+  Device supports Compute Preemption:            Yes
+  Supports Cooperative Kernel Launch:            Yes
+  Supports MultiDevice Co-op Kernel Launch:      Yes
+  Device PCI Domain ID / Bus ID / location ID:   0 / 68 / 0
+  Compute Mode:
+     < Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) >
+
+deviceQuery, CUDA Driver = CUDART, CUDA Driver Version = 12.4, CUDA Runtime Version = 12.3, NumDevs = 1, Device0 = Tesla P100-PCIE-16GB
+Result = PASS
+
+
+P1 = 8x, p1 = 16x, gtx 1650 = 16x
