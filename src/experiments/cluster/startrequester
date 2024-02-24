@@ -1,0 +1,40 @@
+#!/usr/bin/python3.8
+import subprocess
+import sys
+import os
+
+# Configuration variables
+stripedisk = '/mnt/ramstripe'
+stripedevice = '/dev/md/md-ramstripe'
+mountprefix = '/mnt/nfs-'
+
+def run_command(command):
+    """Execute system command."""
+    try:
+        subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Command '{e.cmd}' failed with error:\n{e.output.decode()}")
+
+def is_root():
+    """Check if the script is run as root."""
+    return os.geteuid() == 0
+
+def cleanup_raid_array():
+    """Cleanup RAID array setup."""
+    if not is_root():
+        print("This script must be run as root")
+        sys.exit(1)
+
+    # Unmount stripedisk and stop RAID array
+    if os.path.ismount(stripedisk):
+        run_command(f"umount {stripedisk}")
+    run_command(f"mdadm --stop {stripedevice}")
+    
+    # Release loop devices and unmount NFS mounts
+    run_command("losetup -d /dev/loop*")
+    run_command(f"umount -f {mountprefix}*")
+
+    print("Cleanup complete.")
+
+if __name__ == "__main__":
+    cleanup_raid_array()
