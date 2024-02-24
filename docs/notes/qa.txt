@@ -1,0 +1,27 @@
+Q: What are multimodal models?
+
+Q: What is langchain?
+https://python.langchain.com/docs/integrations/chat/ollama_functions
+
+
+Q: how to load all into ram
+
+llama.cpp docs:
+
+https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md
+
+Environment="USE_MMAP=false" turn turn of loading as needed
+
+Q: Virtualzation, can we virtualize the GPU?
+
+qemu installation (ubuntu)
+https://zacs-tech.com/how-to-install-qemu-kvm-and-virt-manager-on-ubuntu-22-04-lts/
+
+Q: remote ram setup possible?
+
+https://github.com/hannes/rram-linux/blob/master/provider.sh
+
+install these packages
+
+sudo apt-get install -y nfs-common nfs-kernel-server rpcbind net-tools rdma-core mdadm util-linux kmod
+
