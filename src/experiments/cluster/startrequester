@@ -68,7 +68,7 @@ def setup_raid_array(ip_addresses):
     
     # Create RAID0 array
     os.makedirs(STRIPEDISK, exist_ok=True)
-    run_command([ "mdadm", "--create", STIPEDEVICE, "--run", "--chunk=2048", "--level=0", f"--raid-devices={len(loopdevices)}"] + loopdevices)
+    run_command([ "mdadm", "--create", STRIPEDEVICE, "--run", "--chunk=2048", "--level=0", f"--raid-devices={len(loopdevices)}"] + loopdevices)
     run_command(["mkfs.ext4", STRIPEDEVICE])
     run_command(["mount", "-o", "data=writeback,noatime,nodiratime,barrier=0,noacl,nobh,noquota", STRIPEDEVICE, STRIPEDISK])
 

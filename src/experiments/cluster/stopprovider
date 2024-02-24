@@ -19,35 +19,47 @@ def unload_module(module_name):
     else:
         print(f"Module {module_name} is not loaded.")
 
-def unmount_ramdisk(ramdisk_path):
+def unmount_ramdisk():
     """Unmount the ramdisk."""
+    ramdisk_path = '/mnt/ramdisk'  # Hard-coded ramdisk path
     result = subprocess.run(['mount'], capture_output=True, text=True)
     if ramdisk_path in result.stdout:
-        subprocess.run(['umount', ramdisk_path], check=True)
-        print(f"Ramdisk at {ramdisk_path} unmounted.")
+        # Check if the ramdisk is currently in use
+        fuser_output = subprocess.run(['fuser', '-m', ramdisk_path], capture_output=True, text=True)
+        if fuser_output.stdout.strip():
+            print(f"Ramdisk at {ramdisk_path} is currently in use. Attempting to forcefully unmount...")
+            subprocess.run(['umount', '-f', ramdisk_path], check=True)
+            print(f"Ramdisk at {ramdisk_path} forcefully unmounted.")
+        else:
+            # Ramdisk is not in use, proceed with unmounting
+            subprocess.run(['umount', ramdisk_path], check=True)
+            print(f"Ramdisk at {ramdisk_path} unmounted.")
     else:
         print(f"No ramdisk found at {ramdisk_path}.")
 
-def cleanup_exports_and_permissions(ramdisk_path, ip_address):
+def cleanup_exports_and_permissions(ip_address):
     """Placeholder function for cleaning up /etc/exports and /etc/hosts.allow."""
     # Implement cleaning of NFS exports and permissions as needed.
     print("Cleaning up NFS exports and permissions is not automated in this script. Please do it manually if necessary.")
 
-def main(ramdisk_path='/mnt/ramdisk', ip_address=''):
+def main(ip_address=''):
     if not is_root():
         print("This script must be run as root.")
         exit(1)
 
-    unmount_ramdisk(ramdisk_path)
+    unmount_ramdisk()
     
     # Unload RDMA modules if necessary. Be cautious with unloading kernel modules as it might affect other services.
     # unload_module('rpcrdma')
 
-    cleanup_exports_and_permissions(ramdisk_path, ip_address)
+    cleanup_exports_and_permissions(ip_address)
 
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) < 2:
-        print("Usage: python cleanup_script.py <ramdisk path> <IP address>")
+    if len(sys.argv) > 1:
+        main(sys.argv[1])
+    elif len(sys.argv) > 2:
+        print("Usage: python cleanup_script.py [<IP address>]")
         exit(1)
-    main(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else '')
+    else:
+        main()
