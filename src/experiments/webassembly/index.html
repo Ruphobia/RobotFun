@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dot Animation with WebAssembly</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 640;
+        canvas.height = 480;
+
+        let dx = 2;
+        let dy = 2;
+
+        // Correctly referencing the 'updateAndBounce' function from the WebAssembly module
+        fetch('/move_dot.wasm').then(response =>
+            response.arrayBuffer()
+        ).then(bytes =>
+            WebAssembly.instantiate(bytes, {})
+        ).then(result => {
+            const { updateAndBounce, getX, getY } = result.instance.exports; // Corrected function name
+
+            // Animation loop
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                updateAndBounce(canvas.width, canvas.height); // Corrected function call
+
+                // Use the getter functions to access the current positions
+                const posX = getX();
+                const posY = getY();
+
+                ctx.beginPath();
+                ctx.arc(posX, posY, 5, 0, Math.PI * 2);
+                ctx.fill();
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        });
+
+    </script>
+</body>
+</html>
