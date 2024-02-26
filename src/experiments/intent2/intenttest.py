@@ -1,8 +1,10 @@
 #!/usr/bin/python3.8
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import torch
 import json
 from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification, pipeline
-import os
+
 
 def get_current_directory_path():
     """

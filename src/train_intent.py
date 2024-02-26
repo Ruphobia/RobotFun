@@ -20,7 +20,7 @@ from datasets import Dataset
 def get_current_directory_path():
     return os.getcwd()
 
-def load_data(file_path='intents.json'):
+def load_data(file_path='data/intents.json'):
     with open(file_path, 'r') as f:
         intents = json.load(f)
     texts, labels, tag_to_idx = [], [], {}
@@ -42,14 +42,14 @@ def do_training():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    texts, labels, tag_to_idx = load_data(f"{get_current_directory_path()}/intents.json")
+    texts, labels, tag_to_idx = load_data(f"{get_current_directory_path()}/data/intents.json")
     dataset, tokenizer = prepare_dataset(texts, labels)
     dataset = dataset.train_test_split(test_size=0.1)
     train_dataset = dataset['train']
     eval_dataset = dataset['test']
 
     training_args = TrainingArguments(
-        output_dir=f"{get_current_directory_path()}/results",
+        output_dir=f"{get_current_directory_path()}/data",
         evaluation_strategy="epoch",
         save_strategy="epoch",
         learning_rate=5e-5,
@@ -59,7 +59,7 @@ def do_training():
         weight_decay=0.01,
         load_best_model_at_end=True,
         metric_for_best_model="loss",
-        logging_dir=f"{get_current_directory_path()}/logs",
+        logging_dir=f"{get_current_directory_path()}/data/logs",
     )
 
     model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased', num_labels=len(tag_to_idx)).to(device)
@@ -74,7 +74,7 @@ def do_training():
 
     trainer.train()
 
-    model_dir = f"{get_current_directory_path()}/intent_classification_model"
+    model_dir = f"{get_current_directory_path()}/data/intent_classification_model"
     model.save_pretrained(model_dir)
     tokenizer.save_pretrained(model_dir)
 
