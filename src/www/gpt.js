@@ -1,3 +1,8 @@
+// Global variables to manage the state of code blocks
+let inCodeBlock = false;
+let currentCodeWindow = null;
+let currentCodeWindowTitle = null;
+
 document.addEventListener("DOMContentLoaded", function() {
     var headerContainer = document.getElementById("header-container");
     var headerRequest = new XMLHttpRequest();
@@ -68,13 +73,10 @@ document.addEventListener("DOMContentLoaded", function() {
             if (!response.ok) throw new Error('Network response was not ok');
         })
         .catch(error => console.error('Error stopping stream:', error));
+
+        inCodeBlock = false;
     });
 });
-
-// Global variables to manage the state of code blocks
-let inCodeBlock = false;
-let currentCodeWindow = null;
-let currentCodeWindowTitle = null;
 
 function appendContent(data) {
     const outputArea = document.getElementById('ai-prompt-output-area');

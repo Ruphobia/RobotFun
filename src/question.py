@@ -50,6 +50,8 @@ class QuestionGenerator:
         for line in r.iter_lines():
             if self.stop_requested:
                 print("Generation stopped.")
+                if self.callback:
+                    await self.callback("\n\n")
                 break  # Exit the loop to stop processing incoming tokens
             
             body = json.loads(line)
@@ -69,6 +71,8 @@ class QuestionGenerator:
             if body.get('done', False):
                 # Update the internal context with the new context returned by the model
                 self.context = body['context']
+                if self.callback:
+                    await self.callback("\n\n")
                 break  # Ensure we exit the loop when generation is complete
 
     def clear_context(self):
