@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
     footerRequest.send();
 
     const sendButton = document.getElementById('send');
+    const stopButton = document.getElementById('stop'); // Assuming 'stop' is the ID of the stop button
     const promptText = document.getElementById('prompt-text');
     let eventSource;
 
@@ -27,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
         eventSource = new EventSource('/api/stream');
         eventSource.onopen = function(event) {
             sendButton.disabled = false;
+            stopButton.disabled = false; // Enable stop button when stream is open
         };
         eventSource.onmessage = function(event) {
             let formattedData = event.data.trim(); // Remove leading and trailing whitespace
@@ -38,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function() {
         eventSource.onerror = function(event) {
             console.error("SSE error:", event);
             sendButton.disabled = true;
+            stopButton.disabled = true; // Disable stop button on error
         };
     }
 
@@ -56,17 +59,17 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(error => console.error('Error:', error));
     });
+
+    stopButton.addEventListener('click', function() {
+        fetch('/api/stopstream', {
+            method: 'POST',
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+        })
+        .catch(error => console.error('Error stopping stream:', error));
+    });
 });
-
-
-/**
- * Appends content to the document's output area with special handling for code blocks and titles.
- * Replaces escaped quotes with actual quotes and handles tab characters.
- * 
- * @param {string} data - The content to be appended. Can be plain text or JSON string with a message field.
- * @param {none}
- * @returns {void}
- */
 
 // Global variables to manage the state of code blocks
 let inCodeBlock = false;
@@ -101,7 +104,6 @@ function appendContent(data) {
             const copyBtn = document.createElement('button');
             copyBtn.textContent = 'Copy';
             copyBtn.id = 'copy-btn';
-            // Update the onclick function to reference the specific pre element
             copyBtn.onclick = function () {
                 navigator.clipboard.writeText(currentCodeWindow.textContent).then(() => {
                     console.log('Text copied to clipboard');

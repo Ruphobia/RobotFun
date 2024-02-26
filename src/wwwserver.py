@@ -6,13 +6,16 @@ from tornado.ioloop import IOLoop
 import tornado.web
 from sysmon import SysMonHandler, SysMon
 import json
+import asyncio
 
 # application imports
 from helpers import *
 from intent import IntentClassifier
 from coder import CodeGenerator
+from question import QuestionGenerator
 
 clients = []
+promptclass = ""
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self, path=None):
@@ -72,10 +75,10 @@ class StreamHandler(tornado.web.RequestHandler):
         if self in clients:
             clients.remove(self)
 
-
 class PromptHandler(tornado.web.RequestHandler):
     # No need for SSE headers here since we're not streaming from this handler
     def post(self):
+        global promptclass
         data = json.loads(self.request.body)
         prompt = data.get('prompt', '')
         print("Prompt:", prompt)
@@ -84,8 +87,20 @@ class PromptHandler(tornado.web.RequestHandler):
         print("Prompt Class:", promptclass)
 
         if (promptclass == "code"):
-            IOLoop.current().spawn_callback(wizardcoder.generate, prompt)   
-       
+            IOLoop.current().spawn_callback(wizardcoder.generate, prompt)  
+
+        if (promptclass == "question"):
+            IOLoop.current().spawn_callback(wizardquestion.generate, prompt)  
+
+
+class StopStreamHandler(tornado.web.RequestHandler):  
+    def post(self):
+        global promptclass
+        print("Stop:", promptclass)
+        if (promptclass == "code"):
+            wizardcoder.request_stop()
+        if (promptclass == "question"):
+            wizardquestion.request_stop()
 
 async def process_and_communicate_results(response):
     # print("Clients:", len(clients))
@@ -95,6 +110,7 @@ async def process_and_communicate_results(response):
             formatted_response = f"data: {json.dumps(response)}\n\n"
             client.write(formatted_response)
             await client.flush()
+            await asyncio.sleep(0)  # Allows the event loop to handle other tasks
         except Exception as e:
             print(f"Error sending data to client: {e}")
 
@@ -103,6 +119,7 @@ def make_app(sysmon_instance):
         (r"/api/sysmon", SysMonHandler, dict(sysmon_instance=sysmon_instance)),
         (r"/api/promptinput", PromptHandler),
         (r"/api/stream", StreamHandler),
+        (r"/api/stopstream", StopStreamHandler),
         (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./www", "default_filename": "index.html"}),
     ])
 
@@ -111,6 +128,8 @@ intentclassifier = IntentClassifier()
 systemmonitor = SysMon()
 wizardcoder = CodeGenerator()
 wizardcoder.set_callback(process_and_communicate_results)
+wizardquestion = QuestionGenerator()
+wizardquestion.set_callback(process_and_communicate_results)
 print("Starting WWW Server")
 app = make_app(systemmonitor)
 app.listen(8888)

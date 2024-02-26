@@ -1,14 +1,14 @@
 import json
 import requests
 
-class CodeGenerator:
+class QuestionGenerator:
     def __init__(self):
         """Initialize the CodeGenerator with a fixed model and an empty context."""
-        self.model = 'wizardcoder:33b'
+        self.model = 'wizard-vicuna-uncensored:30b-q4_0'
         self.context = []  # Internal context to keep track of the conversation history
         self.callback = None
         self.stop_requested = False  # Flag to control the stopping of generation
-        print("Wizard Coder: Ready")
+        print("Wizard Question: Ready")
 
     def set_callback(self, callback_function):
         """
@@ -17,7 +17,7 @@ class CodeGenerator:
         :param callback_function: The function that handles streamed output.
         """
         self.callback = callback_function
-        print("Wizard Coder Callback Ready")
+        print("Wizard Question Callback Ready")
 
     def request_stop(self):
         """
