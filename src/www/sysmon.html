@@ -54,11 +54,11 @@
                 // Clear previous data
                 document.getElementById('sysmon-data').innerHTML = '';
 
-                // Display CPU temperature bar graph
-                displayBarGraph(data.cpu_temps, data.cpu_max_temp, 'CPU Temperature (°F)', 'cpu-temp', true);
+                // Display CPU temperature bar graph in Celsius
+                displayBarGraph(data.cpu_temps, 'CPU Temperature (°C)', 'CPU Temperature (°C)', 'cpu-temp', true);
 
-                // Display GPU temperature bar graph
-                displayBarGraph(data.gpu_temps, data.gpu_max_temp, 'GPU Temperature (°F)', 'gpu-temp', true);
+                // Display GPU temperature bar graph in Celsius
+                displayBarGraph(data.gpu_temps, 'GPU Temperature (°C)', 'GPU Temperature (°C)', 'gpu-temp', true);
 
                 // Graph each CPU's load percentage
                 displayMultiBarGraph(data.cpu_usages, 'CPU Load (%)', 'cpu-load', data.total_cpu_usage);
@@ -76,7 +76,7 @@
         }
 
         // Function to display bar graph for temperature data
-        function displayBarGraph(data, maxValue, title, containerId, isTemp) {
+        function displayBarGraph(data, title, containerId, isTemp) {
             const container = document.createElement('div');
             container.className = 'bar-graph-container';
             document.getElementById('sysmon-data').appendChild(container);
@@ -90,18 +90,25 @@
             graphBars.className = 'bar-graph';
             container.appendChild(graphBars);
 
+            // Calculate the dynamic maximum temperature from all readings
+            let dynamicMaxValue = Math.max(...data);
+
             data.forEach(value => {
                 const bar = document.createElement('div');
-                bar.style.height = `${value}%`; // Height in percentage for visualization
-                bar.textContent = `${Math.trunc(value)}`; // Truncate to whole number
+                // Calculate height as a percentage of the dynamic maximum
+                let percentageOfMax = (value / dynamicMaxValue) * 100;
+                bar.style.height = `${percentageOfMax}%`; // Adjusted for accurate visual representation
+                bar.textContent = `${Math.trunc(value)}°C`; // Display temperature value inside the bar
                 graphBars.appendChild(bar);
             });
 
+            // Display the dynamic maximum temperature calculated from the readings
             const maxValueElement = document.createElement('div');
-            maxValueElement.textContent = `Max: ${Math.trunc(maxValue)}${isTemp ? '°F' : '%'}`;
+            maxValueElement.textContent = `Max: ${Math.trunc(dynamicMaxValue)}°C`;
             maxValueElement.className = 'max-value';
             container.appendChild(maxValueElement);
         }
+
 
         // Function to display a multi bar graph for load data
         function displayMultiBarGraph(data, title, containerId, totalLoad) {

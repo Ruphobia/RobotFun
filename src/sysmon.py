@@ -75,14 +75,14 @@ class SysMon:
         
     def get_cpu_temperatures(self) -> tuple:
         """
-        Retrieves the temperature of each CPU core in Fahrenheit using psutil library.
+        Retrieves the temperature of each CPU core in Celsius using psutil library.
 
         Returns:
-        tuple: A tuple containing the status code, count of CPU cores, a list of CPU temperatures in Fahrenheit,
+        tuple: A tuple containing the status code, count of CPU cores, a list of CPU temperatures in Celsius,
             and the maximum temperature among all CPU cores.
             Status code: -1 for failure, 0 for success.
             Count of CPU cores: Number of CPU cores detected.
-            List of CPU temperatures: Temperatures of each CPU core in Fahrenheit.
+            List of CPU temperatures: Temperatures of each CPU core in Celsius.
             Max temperature: Maximum temperature among all CPU cores.
         """
         try:
@@ -91,9 +91,9 @@ class SysMon:
             max_temp = float('-inf')
             if 'coretemp' in temps:
                 for temp in temps['coretemp']:
-                    temp_fahrenheit = temp.current * 9/5 + 32
-                    cpu_temps.append(temp_fahrenheit)
-                    max_temp = max(max_temp, temp_fahrenheit)
+                    temp_celsius = temp.current  # Temperature is already in Celsius
+                    cpu_temps.append(temp_celsius)
+                    max_temp = max(max_temp, temp_celsius)
                 return 0, len(cpu_temps), cpu_temps, max_temp
             else:
                 print("Couldn't fetch CPU temperatures. Make sure the hardware and OS support this feature.")
@@ -101,17 +101,18 @@ class SysMon:
         except Exception as e:
             print(f"Error occurred: {e}")
             return -1, 0, [], float('-inf')
+
         
     def get_gpu_temperatures(self) -> tuple:
         """
-        Retrieves the temperature of each GPU in Fahrenheit using GPUtil library.
+        Retrieves the temperature of each GPU in Celsius using GPUtil library.
 
         Returns:
-        tuple: A tuple containing the status code, count of GPU cards, a list of GPU temperatures in Fahrenheit,
+        tuple: A tuple containing the status code, count of GPU cards, a list of GPU temperatures in Celsius,
             and the maximum temperature among all GPUs.
             Status code: -1 for failure, 0 for success.
             Count of GPU cards: Number of GPU cards detected.
-            List of GPU temperatures: Temperatures of each GPU in Fahrenheit.
+            List of GPU temperatures: Temperatures of each GPU in Celsius.
             Max temperature: Maximum temperature among all GPUs.
         """
         try:
@@ -119,13 +120,14 @@ class SysMon:
             gpus = GPUtil.getGPUs()
             max_temp = float('-inf')
             for gpu in gpus:
-                temp_fahrenheit = gpu.temperature * 9/5 + 32
-                gpu_temps.append(temp_fahrenheit)
-                max_temp = max(max_temp, temp_fahrenheit)
+                temp_celsius = gpu.temperature  # Temperature is already in Celsius
+                gpu_temps.append(temp_celsius)
+                max_temp = max(max_temp, temp_celsius)
             return 0, len(gpus), gpu_temps, max_temp
         except Exception as e:
             print(f"Error occurred: {e}")
             return -1, 0, [], float('-inf')
+
         
     def get_cpu_usage(self) -> tuple:
         """
