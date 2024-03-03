@@ -1,4 +1,4 @@
-#!/usr/bin/python3.8
+#!/usr/bin/python3
 # Python Includes
 import os
 import tornado.ioloop
@@ -84,13 +84,14 @@ class PromptHandler(tornado.web.RequestHandler):
         print("Prompt:", prompt)
         save_Prompts(prompt)  # Assuming this is defined elsewhere
         promptclass = intentclassifier.classify_prompt(prompt)  # Assuming this is defined elsewhere
+
         print("Prompt Class:", promptclass)
 
-        if (promptclass == "code"):
-            IOLoop.current().spawn_callback(wizardcoder.generate, prompt)  
+        # if (promptclass == "code"):
+        #     IOLoop.current().spawn_callback(wizardcoder.generate, prompt)  
 
-        if (promptclass == "question"):
-            IOLoop.current().spawn_callback(wizardquestion.generate, prompt)  
+        # if (promptclass == "question"):
+        #     IOLoop.current().spawn_callback(wizardquestion.generate, prompt)  
 
 
 class StopStreamHandler(tornado.web.RequestHandler):  

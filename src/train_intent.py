@@ -1,4 +1,4 @@
-#!/usr/bin/python3.8
+#!/usr/bin/python3
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
 import json
