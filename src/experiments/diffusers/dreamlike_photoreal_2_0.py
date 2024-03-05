@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 import concurrent.futures
-from diffusers import AutoPipelineForText2Image
-import torch
+from diffusers import AutoPipelineForText2Image # need to install this module in your python
+import torch # need to install this model in your python
 
 # Schedulers
 
@@ -32,22 +32,22 @@ import torch
 
 # List of model IDs to test
 model_ids = [
-    "dreamlike-art/dreamlike-photoreal-2.0", # Ok, UC, nice, art like, doesn't follow directions well
+    # "dreamlike-art/dreamlike-photoreal-2.0", # Ok, UC, nice, art like, doesn't follow directions well
     "Yntec/RealLife", # Ok, really good, possibly the best so far, not following directions
-    "digiplay/majicMIX_realistic_v6", # Ok, UC, realistic, but video game like, doesn't follow directions well
-    "SG161222/Realistic_Vision_V5.1_noVAE", # Ok, UC, mostly real, doesn't follow directions
-    "stabilityai/stable-diffusion-xl-base-1.0", # Ok, neat, like post cards or something, doesn't follow directions well
-    "stabilityai/sdxl-turbo", # Ok, UC, strange output, doesn't follow directions well
-    "segmind/SSD-1B", # ok, UC, uh, scarry!!, doesn't follow directions well
-    "dataautogpt3/OpenDalleV1.1", # Ok, good, not following directions
-    "etri-vilab/koala-700m-llava-cap",
-    "22h/vintedois-diffusion-v0-1", # Ok, C
-    "darkstorm2150/Protogen_x5.8_Official_Release", # Ok, C
-    "wavymulder/Analog-Diffusion", # Ok, C
-    "runwayml/stable-diffusion-v1-5", # Ok, C
+    # "digiplay/majicMIX_realistic_v6", # Ok, UC, realistic, but video game like, doesn't follow directions well
+    # "SG161222/Realistic_Vision_V5.1_noVAE", # Ok, UC, mostly real, doesn't follow directions
+    # "stabilityai/stable-diffusion-xl-base-1.0", # Ok, neat, like post cards or something, doesn't follow directions well
+    # "stabilityai/sdxl-turbo", # Ok, UC, strange output, doesn't follow directions well
+    # "segmind/SSD-1B", # ok, UC, uh, scarry!!, doesn't follow directions well
+    # "dataautogpt3/OpenDalleV1.1", # Ok, good, not following directions *
+    # "etri-vilab/koala-700m-llava-cap", # *
+    # "22h/vintedois-diffusion-v0-1", # Ok, C
+    # "darkstorm2150/Protogen_x5.8_Official_Release", # Ok, C *
+    # "wavymulder/Analog-Diffusion", # Ok, C * 
+    # "runwayml/stable-diffusion-v1-5", # Ok, C *
 ]
 
-prompt = "fluffy white kitten playing in a field"
+prompt = "crescent wrench and screw driver with various other tools"
 # Function to perform model inference
 def run_inference(model_id, gpu_index):
     """
@@ -58,26 +58,29 @@ def run_inference(model_id, gpu_index):
     - gpu_index: Index of the GPU to use.
     """
     try:
-        device = f"cuda:{gpu_index}"
-        # device = f"cuda:1"
-        pipe = AutoPipelineForText2Image.from_pretrained(model_id).to(device)
+        device = f"cuda:{gpu_index}"  # <- comment out this line
+        # device = f"cpu" # <- uncomment this line for cpu
+        # device = f"cuda:0" <- or uncomment this out for gpu
 
+        pipe = AutoPipelineForText2Image.from_pretrained(model_id).to(device)
 
         images = pipe(
             prompt=prompt,
             safety_checker="no",
             enhance_prompt="yes",
-            negative_prompt="",
-            samples=2,
+            negative_prompt="deformed eyes, extra limbs, different color eyes",
+            samples=2, # doesn't usually work, model dependant
             width=640,
             height=480,
-            num_inference_steps=20,
-            guidance_scale=3,
+            num_inference_steps=40, # how long we will work on making the image
+            guidance_scale=17.0, # how hard does the model try to adhear to what your asking for. lower number more creative, higher number, better at following instructions
             # scheduler="PNDM",  # Assuming you want to use a different scheduler
             seed=42,  # For reproducibility
             eta=0.5,  # Adjust randomness
         ).images
+
         print("Samples:", len(images))
+
         image = images[0]
         model_id_txt = model_id.replace("/", "_")
         prompt_txt = prompt.replace(" ", "_")
